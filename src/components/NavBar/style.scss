@@ -1,0 +1,15 @@
+.nav-bar{
+  display: flex;
+  position: fixed;
+  align-content: center;
+  width: 100%;
+  align-items: center;
+  justify-content: space-around;
+  height: 80px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6222864145658263) 0%, rgba(0,212,255,0) 82%);
+
+  img{
+    width: 50px;
+    height: 50px;
+  }
+}
