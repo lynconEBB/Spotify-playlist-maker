@@ -1,15 +1,29 @@
 .nav-bar{
   display: flex;
   position: fixed;
-  align-content: center;
   width: 100%;
-  align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   height: 80px;
+  z-index: 2;
+  //background: black;
+  padding: 0 10px;
   background: linear-gradient(180deg, rgba(0,0,0,0.6222864145658263) 0%, rgba(0,212,255,0) 82%);
 
   img{
     width: 50px;
     height: 50px;
+  }
+
+  .logo-n-name{
+    display: flex;
+    align-items: center;
+  }
+
+  .prod-name{
+    margin-left: 10px;
+    line-height: 80px;
+    font-family: Roboto;
+    font-size: 1.2rem;
+    color: #f15a5a;
   }
 }

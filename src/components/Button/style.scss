@@ -1,0 +1,19 @@
+.anchor-button{
+  background-color: #f15a5a;
+  color: white;
+  padding: 10px 30px;
+  font-family: Roboto;
+  font-size: 1.2rem;
+  width: 250px;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  top: 40px;
+  left: 70px;
+  transition: transform 300ms ease-in-out;
+
+  &:hover{
+    transform: scale(1.02);
+  }
+}
