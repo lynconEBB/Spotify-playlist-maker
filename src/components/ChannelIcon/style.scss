@@ -1,0 +1,48 @@
+.icon-container{
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: #262626;
+  padding: 45px;
+  overflow: hidden;
+  margin: 0 50px 50px;
+  position: relative;
+  box-shadow: 5px 3px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 300ms ease-in-out;
+
+  @media screen and (max-width: 460px){
+    margin: 0 0 50px;
+  }
+
+  &:hover{
+    transform: scale(1.03);
+  }
+
+  img{
+    object-fit: fill;
+    width: 200px;
+    margin: 0 auto;
+
+  }
+}
+.pop-over-closed{
+  display: none;
+}
+.pop-over{
+  pointer-events: none;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.6);
+  text-align: center;
+
+  span{
+    font-size: 1.5rem;
+
+    color: white;
+    font-family: Roboto;
+    line-height: 292.2px;
+  }
+}

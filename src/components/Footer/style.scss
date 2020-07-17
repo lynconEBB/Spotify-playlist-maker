@@ -1,0 +1,38 @@
+$footer-height: 400px;
+
+.footer-container{
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  height: $footer-height;
+  background-color: #838282;
+
+  &::after {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: $footer-height;
+    background-color: #838282;
+    transform: skewY(-3deg);
+    top: -63px;
+    right: 0;
+  }
+
+
+}
+
+.footer-wrapper{
+  position: relative;
+
+  img{
+    box-sizing: border-box;
+    position: absolute;
+    object-fit: fill;
+    width: 100%;
+    bottom: 0;
+  }
+  h3{
+    top: 0;
+    position: absolute;
+  }
+}
