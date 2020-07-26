@@ -1,0 +1,29 @@
+{
+  "name": "spotify-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel src --out-dir dist",
+    "prod": "node src/App",
+    "dev": "nodemon --exec babel-node src/App.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "knex": "^0.21.2",
+    "nodemon": "^2.0.4",
+    "pg": "^8.3.0",
+    "query-string": "^6.13.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.10.5",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.10.4"
+  }
+}
