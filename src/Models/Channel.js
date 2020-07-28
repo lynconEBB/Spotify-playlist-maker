@@ -69,21 +69,71 @@ class Channel {
             
             for (let wrapper of songs) {
                 let { snippet:song } = wrapper;
-                
-                let formatedSong = new Song(song.title,song.publishedAt);
 
-                if (formatedSong.publicationDate < formatedLastDate) {
-                    reachLastDate = true;
-                    break;
-                } else {
-                    this.songs.push(formatedSong);
+                if (song.title.includes('-')) {
+                    
+                    let [artist,songName] = this.extractNameAndArtist(song.title); 
+                    
+                    let formatedSong = new Song(artist,songName,song.publishedAt);
+                    
+                    if (formatedSong.publicationDate < formatedLastDate) {
+                        reachLastDate = true;
+                        break;
+                    } else {
+                        this.songs.push(formatedSong);
+                    }
                 }
-            }
+            }    
 
             nxtToken = nextPageToken;
           
         }while (!reachLastDate);
     }
+
+
+    extractNameAndArtist(title) {
+    
+        let [artist,songName] = title.split('-'); 
+                    
+        artist = artist.replace('&',' ');
+        artist = artist.replace("'",'');
+        artist = artist.replace(",",' ');
+        artist = artist.replace(/\sx\s/,' ');
+
+        songName = songName.replace(/'/g,'');
+        
+        
+        let name,featuring = '';
+        
+        if (songName.includes('(')) {
+            [name,featuring] = songName.split('(');
+            featuring = featuring.replace('ft.' ,'');
+            featuring = featuring.replace('feat.' ,'');
+            featuring = featuring.replace('prod. by' ,'');
+            featuring = featuring.replace('with' ,'');
+            featuring = featuring.replace(')' ,'');
+
+            artist = artist + featuring;
+            songName = name;
+        }
+        if (songName.includes('ft.')) {
+            [name,featuring] = songName.split('ft.');
+            artist = artist + featuring;
+            songName = name;
+        }
+        if (songName.includes('feat.')) {
+            [name,featuring] = songName.split('feat.');
+            artist = artist + featuring;
+            songName = name;
+        }
+        if (name == undefined) {
+            
+            return [artist.trim(),songName.trim()];
+        }
+        return [artist.trim(),name.trim()];
+    }
+
 }
 
 export default Channel;
+
