@@ -1,6 +1,7 @@
 import connection from '../database/connection';
 import User from '../Models/User';
 import SpotifyClient from '../services/SpotifyClient';
+import TokenHandler from '../services/TokenHandler';
 
 class UserController {
     constructor() {
@@ -8,15 +9,18 @@ class UserController {
     }
 
     async login(req, res) {
-        const spotifyClient =  new SpotifyClient();
+        
         try {
-            const tokensGenerated = await spotifyClient.getAccessTokenFromCode(req.query.code);
-            
-            const userProfile = await spotifyClient.getUserProfile(tokensGenerated.access_token);
+            const tokensGenerated = await TokenHandler.getAccessTokenFromCode(req.query.code);
+           
+            const spotifyClient =  new SpotifyClient();
+            await spotifyClient.setRequester(tokensGenerated.access_token,tokensGenerated.refresh_token);
 
-            const user = new User(tokensGenerated.access_token,tokensGenerated.refresh_token,userProfile.id);
+            const userProfile = await spotifyClient.getUserProfile();
             
-            if ((await this.listByName(user)).length > 0) {
+            const user = new User(tokensGenerated.access_token,tokensGenerated.refresh_token,userProfile.display_name,userProfile.id);
+            
+            if ((await this.listBySpotifyId(user.spotifyId)) != undefined) {
                 await this.update(user);
             } else {
                 await this.create(user);
@@ -30,13 +34,13 @@ class UserController {
         
     }
 
-    async listByName(user){
-        return await connection('user').where('name',user.name);
+    async listBySpotifyId(spotifyId){
+        return await connection('user').where('spotifyId',spotifyId).first();
     }
 
     async update(user) {
         await connection('user')
-        .where('name',user.name)
+        .where('spotifyId',user.spotifyId)
         .update({
             accessToken: user.accessToken,
             refreshToken: user.refreshToken
@@ -47,9 +51,14 @@ class UserController {
         await connection('user').insert({
             accessToken: user.accessToken,
             refreshToken: user.refreshToken,
-            name: user.name
+            name: user.name,
+            spotifyId: user.spotifyId
         });  
     }  
+    async check(req,res) {
+        
+    }
+
 }
 
 export default UserController;

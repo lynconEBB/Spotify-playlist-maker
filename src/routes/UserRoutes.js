@@ -5,6 +5,6 @@ const userRouter = express.Router();
 const userController = new UserController();
 
 userRouter.get('/user/login',userController.login);
-userRouter.get('/user/auth',userController.login);
+userRouter.get('/user/auth',userController.check);
 
 export default userRouter;

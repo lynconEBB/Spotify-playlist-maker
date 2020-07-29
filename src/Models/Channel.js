@@ -45,7 +45,7 @@ class Channel {
             part:'snippet',
             maxResults: 50,
             playlistId: this.uploadsPlaylistId,
-            key:'AIzaSyCe9T3-7NwlEkAgupO2x9bwBg443sxVEOo',
+            key:process.env.API_KEY,
             fields: 'items(snippet/publishedAt,snippet/title),nextPageToken'
         };
 

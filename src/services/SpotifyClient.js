@@ -1,45 +1,38 @@
 import createSpotifyRequester from './SpotifyRequester';
 import queryString from 'query-string';
 import TokenHandler from './TokenHandler';
-import axios from 'axios';
+import connection from '../database/connection';
+
 class SpotifyClient{
-    constructor(userToken) {
-        this.requester = createSpotifyRequester(userToken);
+    constructor() {
+        this.requester;
+        this.setRequester =  this.setRequester.bind(this);
     }
 
-    async getUserProfile(accessToken) {
-        const requestConfig = {
-            headers:{
-                Authorization:`Bearer ${accessToken}`
-            }
+    async setRequester(userToken,refreshToken) {
+        let response = await TokenHandler.validateAccessToken(userToken,refreshToken);
+        
+        if(response === "validToken") {
+            this.requester = createSpotifyRequester(userToken); 
+            return true;      
+        }else if(response !== false){
+            connection('user')
+                .where('refreshToken',refreshToken)
+                .update({accessToken:response})
+                .then((response)=>{});
+            this.requester = createSpotifyRequester(response);
+            return true;
+        } else {
+            return false;
         }
+    }
+
+    async getUserProfile() {
         try {
-            const response = await axios.get('https://api.spotify.com/v1/me',requestConfig);
+            const response = await this.requester.get('/me');
             return response.data;
         }catch(error) {
-            return error.response;
-        }
-    }
-
-    async getAccessTokenFromCode(code) {
-        const requestBody = queryString.stringify({
-            code: code,
-            redirect_uri: process.env.REDIRECT_URI,
-            grant_type:'authorization_code'
-        });
-        const requestConfig = {
-            headers:{
-                'Authorization': 'Basic ' + TokenHandler.generateBasicAuthToken(),
-                'content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-            }
-        }
-        try {
-            let {data:responseBody} = await axios.post('https://accounts.spotify.com/api/token',requestBody,requestConfig);
-       
-            return responseBody;
-
-        } catch (error) {
-
+            console.log(error);
             return error.response;
         }
     }

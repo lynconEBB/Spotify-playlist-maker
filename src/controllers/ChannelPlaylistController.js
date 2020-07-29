@@ -1,6 +1,6 @@
 import Channel from "../Models/Channel";
 
-class ChannelController {
+class ChannelPlaylistController {
 
     constructor() {
         this.channels = {
@@ -24,4 +24,4 @@ class ChannelController {
     }
 }
 
-export default ChannelController;
+export default ChannelPlaylistController;
