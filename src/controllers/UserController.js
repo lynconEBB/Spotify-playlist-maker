@@ -1,72 +1,55 @@
-import axios from 'axios';
-import queryString from 'query-string';
 import connection from '../database/connection';
-import generateAuth from '../services/generateAuth';
 import User from '../Models/User';
-import SpotifyResourcesGetter from '../services/SpotyResourcesGetter';
+import SpotifyClient from '../services/SpotifyClient';
 
-export default class UserController {
+class UserController {
     constructor() {
         this.login = this.login.bind(this);
     }
 
     async login(req, res) {
-
-        const requestData = queryString.stringify({
-            code: req.query.code,
-            redirect_uri: 'http://localhost:3030/callback',
-            grant_type:'authorization_code'
-        });
-        const requestConfig = {
-            headers:{
-                'Authorization': 'Basic ' + generateAuth(),
-                'content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
-            }
-        }
-
+        const spotifyClient =  new SpotifyClient();
         try {
-            const response = await axios.post('https://accounts.spotify.com/api/token',requestData,requestConfig);
+            const tokensGenerated = await spotifyClient.getAccessTokenFromCode(req.query.code);
             
-            const user = new User(response.data.access_token,response.data.refresh_token);
+            const userProfile = await spotifyClient.getUserProfile(tokensGenerated.access_token);
 
+            const user = new User(tokensGenerated.access_token,tokensGenerated.refresh_token,userProfile.id);
             
-
-            const userProfile = await SpotifyResourcesGetter.getUserProfile(user);
-
-            user.name = userProfile.id;
-
-            await this.create(user);
-
+            if ((await this.listByName(user)).length > 0) {
+                await this.update(user);
+            } else {
+                await this.create(user);
+            }
             res.cookie('spotifyId',user.name);
             res.redirect('http://localhost:3000/main');
             
         } catch (error) {
-
-            console.log(error);
-            res.send(error);
+            res.send(error.response);
         }
         
     }
 
-    async create(user) {
-        const resultUser = await connection('user').where('name',user.name);
-
-        if (resultUser.length == 0) {
-            await connection('user').insert({
-                accessToken: user.accessToken,
-                refreshToken: user.refreshToken,
-                name: user.name
-            });
-        } else {
-            console.log(user);
-
-            await connection('user')
-                .where('name',user.name)
-                .update({
-                    accessToken: user.accessToken,
-                    refreshToken: user.refreshToken
-                });
-        }
+    async listByName(user){
+        return await connection('user').where('name',user.name);
     }
-    
+
+    async update(user) {
+        await connection('user')
+        .where('name',user.name)
+        .update({
+            accessToken: user.accessToken,
+            refreshToken: user.refreshToken
+        });
+    }
+
+    async create(user) {
+        await connection('user').insert({
+            accessToken: user.accessToken,
+            refreshToken: user.refreshToken,
+            name: user.name
+        });  
+    }  
 }
+
+export default UserController;

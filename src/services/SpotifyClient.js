@@ -1,10 +1,47 @@
 import createSpotifyRequester from './SpotifyRequester';
 import queryString from 'query-string';
-
+import TokenHandler from './TokenHandler';
+import axios from 'axios';
 class SpotifyClient{
     constructor(userToken) {
         this.requester = createSpotifyRequester(userToken);
+    }
 
+    async getUserProfile(accessToken) {
+        const requestConfig = {
+            headers:{
+                Authorization:`Bearer ${accessToken}`
+            }
+        }
+        try {
+            const response = await axios.get('https://api.spotify.com/v1/me',requestConfig);
+            return response.data;
+        }catch(error) {
+            return error.response;
+        }
+    }
+
+    async getAccessTokenFromCode(code) {
+        const requestBody = queryString.stringify({
+            code: code,
+            redirect_uri: process.env.REDIRECT_URI,
+            grant_type:'authorization_code'
+        });
+        const requestConfig = {
+            headers:{
+                'Authorization': 'Basic ' + TokenHandler.generateBasicAuthToken(),
+                'content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+            }
+        }
+        try {
+            let {data:responseBody} = await axios.post('https://accounts.spotify.com/api/token',requestBody,requestConfig);
+       
+            return responseBody;
+
+        } catch (error) {
+
+            return error.response;
+        }
     }
 
     async getUriSongs(songs) {

@@ -2,7 +2,7 @@ import ChannelController from "./ChannelController";
 import connection from '../database/connection';
 import SpotifyClient from "../services/SpotifyClient";
 
-class PlaylistController {
+class SpotifyPlaylistController {
 
     async create(req,res) {
     
@@ -15,7 +15,7 @@ class PlaylistController {
             
             songs = songs.concat(channelSongs);
         }
-        const userAccessToken = "BQAkKK7TPwmnFDEqfJ4XiCZqo_ObgYzB7mXTM3LzbTiFJjtND59XZIXw4ivFZo7DeCrokw-cjkdYL9tEYQD2w-NT81rHA40uOgGNlJiXFFJgD0MaUYLwvswGonPS4KF6PDSyLcYeODjujd7HMI2GK54IpQps2-kOFCuDjMZm7qLSjQ";
+        const userAccessToken = "BQDJ0EfAcp6qFIw-jgiieQ6r5NBkWq4Euzk45e9QrKYCIXykW4cT7K6SKS5t44_1lT165YZSXxKprCEHr7H7jcVeuEGkB1gAXR6Fm0VtSinLfD6f2Nw715TCTBQ9CfaDh_hC9bJMzXNcdP1mXKSrWSQrtRP-aftfp8f-pQiJEolkRQ"
         const spotifyClient = new SpotifyClient(userAccessToken);
 
         const uriList = await spotifyClient.getUriSongs(songs);
@@ -26,4 +26,4 @@ class PlaylistController {
     }
 }
 
-export default new PlaylistController();
+export default SpotifyPlaylistController;
