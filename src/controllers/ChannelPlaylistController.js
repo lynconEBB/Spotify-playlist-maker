@@ -24,9 +24,9 @@ class ChannelPlaylistController {
 
                 if (song.title.includes('-')) {
                     
-                    //let [artist,songName] = stringExtractor.extractNameAndArtist(song.title,channel.name); 
+                    let title = stringExtractor.extractNameAndArtist(song.title,channel.name); 
                     
-                    let formatedSong = new Song(song.title,song.title,song.publishedAt);
+                    let formatedSong = new Song(title,song.publishedAt);
                     
                     if (formatedSong.publicationDate < formatedLastDate) {
                         reachLastDate = true;

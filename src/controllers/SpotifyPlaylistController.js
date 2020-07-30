@@ -3,6 +3,9 @@ import SpotifyClient from "../services/SpotifyClient";
 import UserController from "./UserController";
 
 class SpotifyPlaylistController {
+    constructor() {
+        this.create =  this.create.bind(this);
+    }
 
     async create(req,res) {
 
@@ -14,27 +17,21 @@ class SpotifyPlaylistController {
             const spotifyClient = new SpotifyClient();
 
             if (await spotifyClient.setRequester(user.accessToken,user.refreshToken)) {
+
                 const channelController = new ChannelController(); 
                 for (let channel of channels) {
                     let formatedChannel = await channelController.create(channel,lastDate);
                     channelsFormated.push(formatedChannel);
                 }
-                console.log(channelsFormated);
-                console.log(channelsFormated[0].playlist.songs);
-                /*let songs = [];
+                
+                let sortedSongs = this.sortSongsList(channelsFormated);
 
-                for (let channel of channels) {
-                    let channelSongs = await channelController.createSongsList(lastDate, channel);
-                    
-                    songs = songs.concat(channelSongs);
-                }*/
-
-                /*const uriList = await spotifyClient.getUriSongs(songs);
+                const uriList = await spotifyClient.getUriSongs(sortedSongs);
+                
                 const {data:{id:playlistId}} = await spotifyClient.createPlaylist(req.body);
                 const final = await spotifyClient.addItems(uriList,playlistId);
-
-                res.json(final.data);*/
-                res.send("chegou no fim");
+                
+                res.json(final.data);
 
             } else {
                 res.status(400).send("Refresh Token Invalid, login again");
@@ -43,6 +40,14 @@ class SpotifyPlaylistController {
             res.status(404).send("User not Found")
         }
 
+    }
+
+    sortSongsList(channels) {
+        let sortedSongs = [];
+        for(let channel of channels) {
+            sortedSongs = sortedSongs.concat(...channel.playlist.songs);
+        }
+        return [...new Set(sortedSongs)];
     }
 }
 

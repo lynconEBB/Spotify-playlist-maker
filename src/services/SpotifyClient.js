@@ -38,20 +38,18 @@ class SpotifyClient{
     }
 
     async getUriSongs(songs) {
-        
         let uriList = [];
         for(let song of songs) {
             let query = {
-                q:`artist:${song.artist} track:${song.name}`,
+                q:song.title,
                 type:'track',
                 limit:1
-            }
+            };
             let result = await this.requester.get('/search?'+ queryString.stringify(query));
 
             if (result.data.tracks.items.length > 0) {
                 uriList.push(result.data.tracks.items[0].uri);
             }
-            
         }
         return uriList;
     }
@@ -67,10 +65,28 @@ class SpotifyClient{
 
 
     async addItems(uriList,playlistId) {
-        const body = {
-            uris:uriList
+        let steps = uriList.length/100;
+        if (!Number.isInteger(steps)) {
+            steps = parseInt(steps) + 1;
         }
-        return await this.requester.post(`playlists/${playlistId}/tracks`,body);
+
+        for(let i = 0; i<steps; i++ ) {
+            let body;
+            if (i === steps-1) {
+                body = {
+                    uris:uriList.slice(i*100,uriList.length)
+                }
+            } else {
+                body = {
+                    uris:uriList.slice(i*100,(i*100)+100)
+                }
+            }
+           
+            await this.requester.post(`playlists/${playlistId}/tracks`,body);
+        }
+
+        return {status:"tudo certo"};
+        
     }
 }
 

@@ -1,7 +1,6 @@
 class Song {
-    constructor(artist,name,publicationDate){
-        this.artist = artist;
-        this.name = name;
+    constructor(title,publicationDate){
+        this.title = title;
         this.publicationDate = new Date(publicationDate);
     }
 }

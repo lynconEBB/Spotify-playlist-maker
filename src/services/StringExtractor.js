@@ -1,54 +1,31 @@
-import { stringifyUrl } from "query-string";
-
 class StringExtractor {
-    xkito() {
-        console.log('xkito chamada');
-    }
+
+    removeMonsterCatBadge(song) {
+
+    } 
 
     extractNameAndArtist(title,channelName) {
         
-        let [artist,songName] = title.split('-'); 
-                    
-        artist = artist.replace('&',' ');
-        artist = artist.replace("'",'');
-        artist = artist.replace(",",' ');
-        artist = artist.replace(/\sx\s/,' ');
-
-        songName = songName.replace(/'/g,'');
+        title = title.replace(/[fF]t\./g ,' ');
+        title = title.replace(/[Ff]eat./g ,' ');
+        title = title.replace(/[pP]rod\. [bB]y/g ,' ');
+        title = title.replace(/[Ww]ith/g ,'');
+        title = title.replace(/[rR]emix/g ,' ');
+        title = title.replace(/\([mM]usic [vV]ideo\)/g ,' ');
+        title = title.replace(/[eE]dit\.?/g ,' ');
+        title = title.replace(/\)/g ,'');
+        title = title.replace(/\(/g ,'');
+        title = title.replace(/-/g ,'');
+        title = title.replace(/[lL]yrics/g,' ');
+        title = title.replace(/&/g,' ');
+        title = title.replace(/'/g,'');
+        title = title.replace(/,/g,' ');
+        title = title.replace(/\sx\s/,' ');
         
+        title = title.replace(/\s{2,}/g,' ');
         
-        let name,featuring = '';
-        
-        if (songName.includes('(')) {
-            [name,featuring] = songName.split('(');
-            featuring = featuring.replace('ft.' ,'');
-            featuring = featuring.replace('feat.' ,'');
-            featuring = featuring.replace('prod. by' ,'');
-            featuring = featuring.replace('with' ,'');
-            featuring = featuring.replace(')' ,'');
-
-            artist = artist + featuring;
-            songName = name;
-        }
-        if (songName.includes('ft.')) {
-            [name,featuring] = songName.split('ft.');
-            artist = artist + featuring;
-            songName = name;
-        }
-        if (songName.includes('feat.')) {
-            [name,featuring] = songName.split('feat.');
-            artist = artist + featuring;
-            songName = name;
-        }
-        if (name == undefined) {
-            
-            return [artist.trim(),songName.trim()];
-        }
-        return [artist.trim(),name.trim()];
+        return title.trim(); 
     }
 }
 
 export default StringExtractor;
-
-const stringExtractor =  new StringExtractor();
-stringExtractor.extractNameAndArtist('gdkflgj  -gd gdf','xkito');
