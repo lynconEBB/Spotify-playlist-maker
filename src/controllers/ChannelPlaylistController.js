@@ -1,27 +1,66 @@
-import Channel from "../Models/Channel";
-
+import ChannelPlaylist from "../Models/ChannelPlaylist";
+import StringExtractor from "../services/StringExtractor";
+import queryString from "query-string";
+import youtubeRequester from '../services/YoutubeRequester';
+import Song from '../Models/Song';
 class ChannelPlaylistController {
-
     constructor() {
-        this.channels = {
-            MrSuicideSheep:"UC5nc_ZtjKW1htCVZVRxlQAQ",
-            xKito:"UCMOgdURr7d8pOVlc-alkfRg",
-            cloudKid:"UCSa8IUd1uEjlREMa21I3ZPQ",
-            fireFlyMusic:"UCermf7vqBLEsYL-X_8gBcUg"
-        } 
-        
-        this.createSongsList = this.createSongsList.bind(this);
+        this.create = this.create.bind(this);
+
     }
 
-    async createSongsList(lastDate,channelName) {
+    async create(id,lastDate,channel) {
+        let formatedLastDate = new Date(lastDate);
+        let reachLastDate = false;
+        let nxtToken = false;
+        const stringExtractor =  new StringExtractor();
+        let formatedSongs = [];
 
-        const channelId = this.channels[channelName];
-        const channel =  new Channel(channelId,channelName);
-        await channel.findUploadsPlaylistId();
-        await channel.selectSongs(lastDate)          
+        do {
+          
+            const {data:{items:songs, nextPageToken}} = await this.requestSongs(nxtToken,id);
+            for (let wrapper of songs) {
+                let { snippet:song } = wrapper;
 
-        return channel.songs;
+                if (song.title.includes('-')) {
+                    
+                    //let [artist,songName] = stringExtractor.extractNameAndArtist(song.title,channel.name); 
+                    
+                    let formatedSong = new Song(song.title,song.title,song.publishedAt);
+                    
+                    if (formatedSong.publicationDate < formatedLastDate) {
+                        reachLastDate = true;
+                        break;
+                    } else {
+                        formatedSongs.push(formatedSong);
+                    }
+                }
+            }    
+
+            nxtToken = nextPageToken;
+          
+        }while (!reachLastDate);
+
+        return new ChannelPlaylist(id,formatedSongs);
     }
+
+    async requestSongs(nextPageToken,id) {
+        const query = {
+            part:'snippet',
+            maxResults: 50,
+            playlistId: id,
+            key:process.env.API_KEY,
+            fields: 'items(snippet/publishedAt,snippet/title),nextPageToken'
+        };
+
+        if (nextPageToken) {
+            query.pageToken = nextPageToken;
+        }
+
+        return await youtubeRequester('playlistItems?' + queryString.stringify(query)); 
+    }
+
+
 }
 
 export default ChannelPlaylistController;
